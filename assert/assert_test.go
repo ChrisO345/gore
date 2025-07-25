@@ -180,6 +180,20 @@ func TestContains_Assert(t *testing.T) {
 	}
 }
 
+func TestNotContains_Assert(t *testing.T) {
+	mt := newMockT()
+	NotContains(mt, []int{1, 2, 3}, 4)
+	if mt.failed {
+		t.Error("NotContains failed on non-existing item")
+	}
+
+	mt = newMockT()
+	NotContains(mt, []int{1, 2, 3}, 2)
+	if !mt.failed {
+		t.Error("NotContains did not fail on existing item")
+	}
+}
+
 func TestLength_Assert(t *testing.T) {
 	mt := newMockT()
 	Length(mt, []int{1, 2, 3}, 3)
@@ -261,5 +275,33 @@ func TestIsClose_Assert(t *testing.T) {
 	IsClose(mt, 1.01, 1.00, 0.001)
 	if !mt.failed {
 		t.Error("IsClose did not fail outside tolerance")
+	}
+}
+
+func TestStringContains_Assert(t *testing.T) {
+	mt := newMockT()
+	StringContains(mt, "hello world", "world")
+	if mt.failed {
+		t.Error("ContainsString failed on existing substring")
+	}
+
+	mt = newMockT()
+	StringContains(mt, "hello", "world")
+	if !mt.failed {
+		t.Error("ContainsString did not fail on non-existing substring")
+	}
+}
+
+func TestStringNotContains_Assert(t *testing.T) {
+	mt := newMockT()
+	NotStringContains(mt, "hello world", "world")
+	if !mt.failed {
+		t.Error("NotContainsString did not fail on existing substring")
+	}
+
+	mt = newMockT()
+	NotStringContains(mt, "hello", "world")
+	if mt.failed {
+		t.Error("NotContainsString failed on non-existing substring")
 	}
 }

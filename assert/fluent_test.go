@@ -108,6 +108,20 @@ func TestContains_Fluent(t *testing.T) {
 	}
 }
 
+func TestNotContains_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).NotContains([]any{1, 2, 3}, 4)
+	if mt.failed {
+		t.Error("NotContains failed on non-existing item")
+	}
+
+	mt = newMockT()
+	That(mt).NotContains([]any{1, 2, 3}, 2)
+	if !mt.failed {
+		t.Error("NotContains did not fail on existing item")
+	}
+}
+
 func TestLength_Fluent(t *testing.T) {
 	mt := newMockT()
 	That(mt).Length([]any{1, 2, 3}, 3)
@@ -147,5 +161,33 @@ func TestSafe_Fluent(t *testing.T) {
 	That(mt).Safe(func() { panic("boom") })
 	if !mt.failed {
 		t.Error("Safe did not fail on panicking function")
+	}
+}
+
+func TestStringContains_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).StringContains("hello world", "world")
+	if mt.failed {
+		t.Error("StringContains failed on existing substring")
+	}
+
+	mt = newMockT()
+	That(mt).StringContains("hello world", "test")
+	if !mt.failed {
+		t.Error("StringContains did not fail on non-existing substring")
+	}
+}
+
+func TestNotStringContains_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).NotStringContains("hello world", "test")
+	if mt.failed {
+		t.Error("NotStringContains failed on non-existing substring")
+	}
+
+	mt = newMockT()
+	That(mt).NotStringContains("hello world", "world")
+	if !mt.failed {
+		t.Error("NotStringContains did not fail on existing substring")
 	}
 }

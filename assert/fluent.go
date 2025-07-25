@@ -79,6 +79,12 @@ func (a *Assertion) Contains(slice []any, item any) {
 	Contains(a.T, slice, item)
 }
 
+// NotContains checks if a slice does not contain a specific item
+func (a *Assertion) NotContains(slice []any, item any) {
+	a.T.Helper()
+	NotContains(a.T, slice, item)
+}
+
 // Length checks the length of a collection
 func (a *Assertion) Length(collection []any, expectedLength int) {
 	a.T.Helper()
@@ -113,4 +119,20 @@ func (a *Assertion) Safe(fn func()) {
 func (a *Assertion) IsClose(actual, expected any, tolerance float64) {
 	a.T.Helper()
 	a.T.Fatalf("IsClose is not implemented in fluent style yet, use IsClose directly")
+}
+
+// StringContains checks if a string contains a substring
+func (a *Assertion) StringContains(s, substring string) {
+	a.T.Helper()
+	if !containsString(s, substring) {
+		a.T.Errorf("%s", getErrorMessage(substring, s))
+	}
+}
+
+// NotStringContains checks if a string does not contain a substring
+func (a *Assertion) NotStringContains(s, substring string) {
+	a.T.Helper()
+	if containsString(s, substring) {
+		a.T.Errorf("%s", getErrorMessage("not contains", s))
+	}
 }

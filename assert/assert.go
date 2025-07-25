@@ -84,11 +84,19 @@ func NotNil(t testing.TB, value any) {
 	}
 }
 
-// Contains checks if a container (string or slice) contains an item
+// Contains checks if a container contains an item
 func Contains[T comparable](t testing.TB, container []T, item T) {
 	t.Helper()
 	if !contains(container, item) {
 		t.Errorf("%s", getErrorMessage(item, container))
+	}
+}
+
+// NotContains checks if a container does not contain an item
+func NotContains[T comparable](t testing.TB, container []T, item T) {
+	t.Helper()
+	if contains(container, item) {
+		t.Errorf("%s", getErrorMessage("not contains", item))
 	}
 }
 
@@ -145,5 +153,21 @@ func IsClose(t testing.TB, actual, expected, tolerance float64) {
 	t.Helper()
 	if (expected-actual) > tolerance || (actual-expected) > tolerance {
 		t.Errorf("%s", getErrorMessage(expected, actual))
+	}
+}
+
+// StringContains checks if a string contains a substring
+func StringContains(t testing.TB, str, substr string) {
+	t.Helper()
+	if !containsString(str, substr) {
+		t.Errorf("%s", getErrorMessage(substr, str))
+	}
+}
+
+// NotStringContains checks if a string does not contain a substring
+func NotStringContains(t testing.TB, str, substr string) {
+	t.Helper()
+	if containsString(str, substr) {
+		t.Errorf("%s", getErrorMessage("not contains", str))
 	}
 }

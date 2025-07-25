@@ -19,6 +19,11 @@ func contains[T comparable](slice []T, item T) bool {
 	return slices.Contains(slice, item)
 }
 
+// stringContains checks if a string contains a substring
+func containsString(s, substring string) bool {
+	return slices.Contains([]rune(s), rune(substring[0]))
+}
+
 // getLength returns the length of a collection
 func getLength[T container](collection T) int {
 	return len(collection)
