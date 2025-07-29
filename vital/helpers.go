@@ -2,9 +2,11 @@
 
 package vital
 
-import "slices"
-
-import "fmt"
+import (
+	"fmt"
+	"slices"
+	"strings"
+)
 
 // getErrorMessage formats the error message for assertion failures
 func getErrorMessage(expected, actual any) string {
@@ -19,9 +21,19 @@ func contains[T comparable](slice []T, item T) bool {
 	return slices.Contains(slice, item)
 }
 
-// stringContains checks if a string contains a substring
+// containsString checks if a string contains a substring.
 func containsString(s, substring string) bool {
-	return slices.Contains([]rune(s), rune(substring[0]))
+	return strings.Contains(s, substring)
+}
+
+// hasPrefix checks if a string starts with a specific prefix.
+func hasPrefix(s, prefix string) bool {
+	return strings.HasPrefix(s, prefix)
+}
+
+// hasSuffix checks if a string ends with a specific suffix.
+func hasSuffix(s, suffix string) bool {
+	return strings.HasSuffix(s, suffix)
 }
 
 // getLength returns the length of a collection

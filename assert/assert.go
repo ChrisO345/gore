@@ -68,44 +68,11 @@ func False(t testing.TB, condition bool) {
 	}
 }
 
-// Nil checks if a value is nil
-func Nil(t testing.TB, value any) {
+// IsClose checks if a value is close to another value within a tolerance
+func IsClose(t testing.TB, actual, expected, tolerance float64) {
 	t.Helper()
-	if value != nil {
-		t.Errorf("%s", getErrorMessage(nil, value))
-	}
-}
-
-// NotNil checks if a value is not nil
-func NotNil(t testing.TB, value any) {
-	t.Helper()
-	if value == nil {
-		t.Errorf("%s", getErrorMessage("not nil", "nil"))
-	}
-}
-
-// Contains checks if a container contains an item
-func Contains[T comparable](t testing.TB, container []T, item T) {
-	t.Helper()
-	if !contains(container, item) {
-		t.Errorf("%s", getErrorMessage(item, container))
-	}
-}
-
-// NotContains checks if a container does not contain an item
-func NotContains[T comparable](t testing.TB, container []T, item T) {
-	t.Helper()
-	if contains(container, item) {
-		t.Errorf("%s", getErrorMessage("not contains", item))
-	}
-}
-
-// Length checks if a collection has the expected length
-func Length[T container](t testing.TB, collection T, expectedLength int) {
-	t.Helper()
-	actualLength := getLength(collection)
-	if actualLength != expectedLength {
-		t.Errorf("%s", getErrorMessage(expectedLength, actualLength))
+	if (expected-actual) > tolerance || (actual-expected) > tolerance {
+		t.Errorf("%s", getErrorMessage(expected, actual))
 	}
 }
 
@@ -122,6 +89,24 @@ func NotZero[T numeric](t testing.TB, v T) {
 	t.Helper()
 	if v == 0 {
 		t.Errorf("%s", getErrorMessage("not zero", v))
+	}
+}
+
+// === ERRORS ===
+
+// Nil checks if a value is nil
+func Nil(t testing.TB, value any) {
+	t.Helper()
+	if value != nil {
+		t.Errorf("%s", getErrorMessage(nil, value))
+	}
+}
+
+// NotNil checks if a value is not nil
+func NotNil(t testing.TB, value any) {
+	t.Helper()
+	if value == nil {
+		t.Errorf("%s", getErrorMessage("not nil", "nil"))
 	}
 }
 
@@ -148,13 +133,36 @@ func Safe(t testing.TB, f func()) {
 	f()
 }
 
-// IsClose checks if a value is close to another value within a tolerance
-func IsClose(t testing.TB, actual, expected, tolerance float64) {
+// === CONTAINERS ===
+
+// Contains checks if a container contains an item
+func Contains[T comparable](t testing.TB, container []T, item T) {
 	t.Helper()
-	if (expected-actual) > tolerance || (actual-expected) > tolerance {
-		t.Errorf("%s", getErrorMessage(expected, actual))
+	if !contains(container, item) {
+		t.Errorf("%s", getErrorMessage(item, container))
 	}
 }
+
+// NotContains checks if a container does not contain an item
+func NotContains[T comparable](t testing.TB, container []T, item T) {
+	t.Helper()
+	if contains(container, item) {
+		t.Errorf("%s", getErrorMessage("not contains", item))
+	}
+}
+
+// Length checks if a collection has the expected length
+func Length[T container](t testing.TB, collection T, expectedLength int) {
+	t.Helper()
+	actualLength := getLength(collection)
+	if actualLength != expectedLength {
+		t.Errorf("%s", getErrorMessage(expectedLength, actualLength))
+	}
+}
+
+// === STRINGS ===
+// TODO: This can likely be improved into single collection function with by using typeswitch
+// This would also improve the go generation of the code for fluent assertions.
 
 // StringContains checks if a string contains a substring
 func StringContains(t testing.TB, str, substr string) {
@@ -169,5 +177,37 @@ func NotStringContains(t testing.TB, str, substr string) {
 	t.Helper()
 	if containsString(str, substr) {
 		t.Errorf("%s", getErrorMessage("not contains", str))
+	}
+}
+
+// PrefixString checks if a string starts with a specific prefix
+func PrefixString(t testing.TB, str, prefix string) {
+	t.Helper()
+	if !hasPrefix(str, prefix) {
+		t.Errorf("%s", getErrorMessage(prefix, str))
+	}
+}
+
+// NotPrefixString checks if a string does not start with a specific prefix
+func NotPrefixString(t testing.TB, str, prefix string) {
+	t.Helper()
+	if hasPrefix(str, prefix) {
+		t.Errorf("%s", getErrorMessage("not prefix", str))
+	}
+}
+
+// SuffixString checks if a string ends with a specific suffix
+func SuffixString(t testing.TB, str, suffix string) {
+	t.Helper()
+	if !hasSuffix(str, suffix) {
+		t.Errorf("%s", getErrorMessage(suffix, str))
+	}
+}
+
+// NotSuffixString checks if a string does not end with a specific suffix
+func NotSuffixString(t testing.TB, str, suffix string) {
+	t.Helper()
+	if hasSuffix(str, suffix) {
+		t.Errorf("%s", getErrorMessage("not suffix", str))
 	}
 }

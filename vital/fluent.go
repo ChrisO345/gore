@@ -63,6 +63,26 @@ func (a *Assertion) False(condition bool) {
 	False(a.T, condition)
 }
 
+// IsClose checks if two floating-point numbers are close to each other
+func (a *Assertion) IsClose(actual, expected any, tolerance float64) {
+	a.T.Helper()
+	a.T.Fatalf("IsClose is not implemented in fluent style yet, use IsClose directly")
+}
+
+// Zero checks if a numeric value is zero
+func (a *Assertion) Zero(value any) {
+	a.T.Helper()
+	a.T.Fatalf("Zero is not implemented in fluent style yet, use Zero directly")
+}
+
+// NotZero checks if a numeric value is not zero
+func (a *Assertion) NotZero(value any) {
+	a.T.Helper()
+	a.T.Fatalf("NotZero is not implemented in fluent style yet, use NotZero directly")
+}
+
+// === ERRORS ===
+
 // Nil checks if a value is nil
 func (a *Assertion) Nil(value any) {
 	a.T.Helper()
@@ -74,6 +94,20 @@ func (a *Assertion) NotNil(value any) {
 	a.T.Helper()
 	NotNil(a.T, value)
 }
+
+// Panic checks if a function panics
+func (a *Assertion) Panic(fn func()) {
+	a.T.Helper()
+	Panic(a.T, fn)
+}
+
+// Safe checks if a function does not panic
+func (a *Assertion) Safe(fn func()) {
+	a.T.Helper()
+	Safe(a.T, fn)
+}
+
+// === CONTAINERS ===
 
 // Contains checks if a slice contains a specific item
 func (a *Assertion) Contains(slice []any, item any) {
@@ -93,35 +127,7 @@ func (a *Assertion) Length(collection []any, expectedLength int) {
 	Length(a.T, collection, expectedLength)
 }
 
-// Zero checks if a numeric value is zero
-func (a *Assertion) Zero(value any) {
-	a.T.Helper()
-	a.T.Fatalf("Zero is not implemented in fluent style yet, use Zero directly")
-}
-
-// NotZero checks if a numeric value is not zero
-func (a *Assertion) NotZero(value any) {
-	a.T.Helper()
-	a.T.Fatalf("NotZero is not implemented in fluent style yet, use NotZero directly")
-}
-
-// Panic checks if a function panics
-func (a *Assertion) Panic(fn func()) {
-	a.T.Helper()
-	Panic(a.T, fn)
-}
-
-// Safe checks if a function does not panic
-func (a *Assertion) Safe(fn func()) {
-	a.T.Helper()
-	Safe(a.T, fn)
-}
-
-// IsClose checks if two floating-point numbers are close to each other
-func (a *Assertion) IsClose(actual, expected any, tolerance float64) {
-	a.T.Helper()
-	a.T.Fatalf("IsClose is not implemented in fluent style yet, use IsClose directly")
-}
+// === STRINGS ===
 
 // StringContains checks if a string contains a substring
 func (a *Assertion) StringContains(s, substring string) {
@@ -136,6 +142,38 @@ func (a *Assertion) NotStringContains(s, substring string) {
 	a.T.Helper()
 	if containsString(s, substring) {
 		a.T.Errorf("%s", getErrorMessage("not contains", s))
+	}
+}
+
+// PrefixString checks if a string starts with a specific prefix
+func (a *Assertion) PrefixString(s, prefix string) {
+	a.T.Helper()
+	if !hasPrefix(s, prefix) {
+		a.T.Errorf("%s", getErrorMessage(prefix, s))
+	}
+}
+
+// NotPrefixString checks if a string does not start with a specific prefix
+func (a *Assertion) NotPrefixString(s, prefix string) {
+	a.T.Helper()
+	if hasPrefix(s, prefix) {
+		a.T.Errorf("%s", getErrorMessage("not starts with", s))
+	}
+}
+
+// SuffixString checks if a string ends with a specific suffix
+func (a *Assertion) SuffixString(s, suffix string) {
+	a.T.Helper()
+	if !hasSuffix(s, suffix) {
+		a.T.Errorf("%s", getErrorMessage(suffix, s))
+	}
+}
+
+// NotSuffixString checks if a string does not end with a specific suffix
+func (a *Assertion) NotSuffixString(s, suffix string) {
+	a.T.Helper()
+	if hasSuffix(s, suffix) {
+		a.T.Errorf("%s", getErrorMessage("not ends with", s))
 	}
 }
 

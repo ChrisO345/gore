@@ -60,6 +60,8 @@ func TestFalse_Fluent(t *testing.T) {
 	}
 }
 
+/// === ERRORS ===
+
 func TestNil_Fluent(t *testing.T) {
 	var ptr *int
 	mt := newMockT()
@@ -94,6 +96,36 @@ func TestNotNil_Fluent(t *testing.T) {
 	}
 }
 
+func TestPanic_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).Panic(func() { panic("boom") })
+	if mt.failed {
+		t.Error("Panic failed on actual panic")
+	}
+
+	mt = newMockT()
+	That(mt).Panic(func() {})
+	if !mt.failed {
+		t.Error("Panic did not fail when no panic occurred")
+	}
+}
+
+func TestSafe_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).Safe(func() {})
+	if mt.failed {
+		t.Error("Safe failed on non-panicking function")
+	}
+
+	mt = newMockT()
+	That(mt).Safe(func() { panic("boom") })
+	if !mt.failed {
+		t.Error("Safe did not fail on panicking function")
+	}
+}
+
+// === CONTAINERS ===
+
 func TestContains_Fluent(t *testing.T) {
 	mt := newMockT()
 	That(mt).Contains([]any{1, 2, 3}, 2)
@@ -107,6 +139,8 @@ func TestContains_Fluent(t *testing.T) {
 		t.Error("Contains did not fail on non-existing item")
 	}
 }
+
+// === STRINGS ===
 
 func TestNotContains_Fluent(t *testing.T) {
 	mt := newMockT()
@@ -136,34 +170,6 @@ func TestLength_Fluent(t *testing.T) {
 	}
 }
 
-func TestPanic_Fluent(t *testing.T) {
-	mt := newMockT()
-	That(mt).Panic(func() { panic("boom") })
-	if mt.failed {
-		t.Error("Panic failed on actual panic")
-	}
-
-	mt = newMockT()
-	That(mt).Panic(func() {})
-	if !mt.failed {
-		t.Error("Panic did not fail when no panic occurred")
-	}
-}
-
-func TestSafe_Fluent(t *testing.T) {
-	mt := newMockT()
-	That(mt).Safe(func() {})
-	if mt.failed {
-		t.Error("Safe failed on non-panicking function")
-	}
-
-	mt = newMockT()
-	That(mt).Safe(func() { panic("boom") })
-	if !mt.failed {
-		t.Error("Safe did not fail on panicking function")
-	}
-}
-
 func TestStringContains_Fluent(t *testing.T) {
 	mt := newMockT()
 	That(mt).StringContains("hello world", "world")
@@ -189,5 +195,61 @@ func TestNotStringContains_Fluent(t *testing.T) {
 	That(mt).NotStringContains("hello world", "world")
 	if !mt.failed {
 		t.Error("NotStringContains did not fail on existing substring")
+	}
+}
+
+func TestPrefixString_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).PrefixString("hello world", "hello")
+	if mt.failed {
+		t.Error("PrefixString failed on correct prefix")
+	}
+
+	mt = newMockT()
+	That(mt).PrefixString("hello world", "world")
+	if !mt.failed {
+		t.Error("PrefixString did not fail on incorrect prefix")
+	}
+}
+
+func TestNotPrefixString_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).NotPrefixString("hello world", "world")
+	if mt.failed {
+		t.Error("NotPrefixString failed on incorrect prefix")
+	}
+
+	mt = newMockT()
+	That(mt).NotPrefixString("hello world", "hello")
+	if !mt.failed {
+		t.Error("NotPrefixString did not fail on correct prefix")
+	}
+}
+
+func TestSuffixString_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).SuffixString("hello world", "world")
+	if mt.failed {
+		t.Error("SuffixString failed on correct suffix")
+	}
+
+	mt = newMockT()
+	That(mt).SuffixString("hello world", "hello")
+	if !mt.failed {
+		t.Error("SuffixString did not fail on incorrect suffix")
+	}
+}
+
+func TestNotSuffixString_Fluent(t *testing.T) {
+	mt := newMockT()
+	That(mt).NotSuffixString("hello world", "hello")
+	if mt.failed {
+		t.Error("NotSuffixString failed on incorrect suffix")
+	}
+
+	mt = newMockT()
+	That(mt).NotSuffixString("hello world", "world")
+	if !mt.failed {
+		t.Error("NotSuffixString did not fail on correct suffix")
 	}
 }

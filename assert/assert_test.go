@@ -132,6 +132,50 @@ func TestFalse_Assert(t *testing.T) {
 	}
 }
 
+func TestIsClose_Assert(t *testing.T) {
+	mt := newMockT()
+	IsClose(mt, 1.01, 1.00, 0.02)
+	if mt.failed {
+		t.Error("IsClose failed within tolerance")
+	}
+
+	mt = newMockT()
+	IsClose(mt, 1.01, 1.00, 0.001)
+	if !mt.failed {
+		t.Error("IsClose did not fail outside tolerance")
+	}
+}
+
+func TestZero_Assert(t *testing.T) {
+	mt := newMockT()
+	Zero(mt, 0)
+	if mt.failed {
+		t.Error("Zero failed on zero value")
+	}
+
+	mt = newMockT()
+	Zero(mt, 1)
+	if !mt.failed {
+		t.Error("Zero did not fail on non-zero value")
+	}
+}
+
+func TestNotZero_Assert(t *testing.T) {
+	mt := newMockT()
+	NotZero(mt, 1)
+	if mt.failed {
+		t.Error("NotZero failed on non-zero value")
+	}
+
+	mt = newMockT()
+	NotZero(mt, 0)
+	if !mt.failed {
+		t.Error("NotZero did not fail on zero value")
+	}
+}
+
+// === ERRORS ===
+
 func TestNil_Assert(t *testing.T) {
 	var ptr *int
 	mt := newMockT()
@@ -165,6 +209,36 @@ func TestNotNil_Assert(t *testing.T) {
 		t.Error("NotNil failed on non-nil value")
 	}
 }
+
+func TestPanic_Assert(t *testing.T) {
+	mt := newMockT()
+	Panic(mt, func() { panic("boom") })
+	if mt.failed {
+		t.Error("Panic failed on actual panic")
+	}
+
+	mt = newMockT()
+	Panic(mt, func() {})
+	if !mt.failed {
+		t.Error("Panic did not fail when no panic occurred")
+	}
+}
+
+func TestSafe_Assert(t *testing.T) {
+	mt := newMockT()
+	Safe(mt, func() {})
+	if mt.failed {
+		t.Error("Safe failed on non-panicking function")
+	}
+
+	mt = newMockT()
+	Safe(mt, func() { panic("boom") })
+	if !mt.failed {
+		t.Error("Safe did not fail on panicking function")
+	}
+}
+
+// === CONTAINERS ===
 
 func TestContains_Assert(t *testing.T) {
 	mt := newMockT()
@@ -208,81 +282,19 @@ func TestLength_Assert(t *testing.T) {
 	}
 }
 
-func TestZero_Assert(t *testing.T) {
-	mt := newMockT()
-	Zero(mt, 0)
-	if mt.failed {
-		t.Error("Zero failed on zero value")
-	}
-
-	mt = newMockT()
-	Zero(mt, 1)
-	if !mt.failed {
-		t.Error("Zero did not fail on non-zero value")
-	}
-}
-
-func TestNotZero_Assert(t *testing.T) {
-	mt := newMockT()
-	NotZero(mt, 1)
-	if mt.failed {
-		t.Error("NotZero failed on non-zero value")
-	}
-
-	mt = newMockT()
-	NotZero(mt, 0)
-	if !mt.failed {
-		t.Error("NotZero did not fail on zero value")
-	}
-}
-
-func TestPanic_Assert(t *testing.T) {
-	mt := newMockT()
-	Panic(mt, func() { panic("boom") })
-	if mt.failed {
-		t.Error("Panic failed on actual panic")
-	}
-
-	mt = newMockT()
-	Panic(mt, func() {})
-	if !mt.failed {
-		t.Error("Panic did not fail when no panic occurred")
-	}
-}
-
-func TestSafe_Assert(t *testing.T) {
-	mt := newMockT()
-	Safe(mt, func() {})
-	if mt.failed {
-		t.Error("Safe failed on non-panicking function")
-	}
-
-	mt = newMockT()
-	Safe(mt, func() { panic("boom") })
-	if !mt.failed {
-		t.Error("Safe did not fail on panicking function")
-	}
-}
-
-func TestIsClose_Assert(t *testing.T) {
-	mt := newMockT()
-	IsClose(mt, 1.01, 1.00, 0.02)
-	if mt.failed {
-		t.Error("IsClose failed within tolerance")
-	}
-
-	mt = newMockT()
-	IsClose(mt, 1.01, 1.00, 0.001)
-	if !mt.failed {
-		t.Error("IsClose did not fail outside tolerance")
-	}
-}
+/// === STRINGS ===
 
 func TestStringContains_Assert(t *testing.T) {
 	mt := newMockT()
 	StringContains(mt, "hello world", "world")
 	if mt.failed {
 		t.Error("ContainsString failed on existing substring")
+	}
+
+	mt = newMockT()
+	StringContains(mt, "hello world", "hill")
+	if !mt.failed {
+		t.Error("ContainsString did not fail on non-existing substring")
 	}
 
 	mt = newMockT()
@@ -300,8 +312,70 @@ func TestStringNotContains_Assert(t *testing.T) {
 	}
 
 	mt = newMockT()
+	NotStringContains(mt, "hello world", "hill")
+	if mt.failed {
+		t.Error("NotContainsString failed on non-existing substring")
+	}
+
+	mt = newMockT()
 	NotStringContains(mt, "hello", "world")
 	if mt.failed {
 		t.Error("NotContainsString failed on non-existing substring")
+	}
+}
+
+func TestPrefixString_Assert(t *testing.T) {
+	mt := newMockT()
+	PrefixString(mt, "hello world", "hello")
+	if mt.failed {
+		t.Error("PrefixString failed on correct prefix")
+	}
+
+	mt = newMockT()
+	PrefixString(mt, "hello world", "world")
+	if !mt.failed {
+		t.Error("PrefixString did not fail on incorrect prefix")
+	}
+}
+
+func TestNotPrefixString_Assert(t *testing.T) {
+	mt := newMockT()
+	NotPrefixString(mt, "hello world", "world")
+	if mt.failed {
+		t.Error("NotPrefixString failed on incorrect prefix")
+	}
+
+	mt = newMockT()
+	NotPrefixString(mt, "hello world", "hello")
+	if !mt.failed {
+		t.Error("NotPrefixString did not fail on correct prefix")
+	}
+}
+
+func TestSuffixString_Assert(t *testing.T) {
+	mt := newMockT()
+	SuffixString(mt, "hello world", "world")
+	if mt.failed {
+		t.Error("SuffixString failed on correct suffix")
+	}
+
+	mt = newMockT()
+	SuffixString(mt, "hello world", "hello")
+	if !mt.failed {
+		t.Error("SuffixString did not fail on incorrect suffix")
+	}
+}
+
+func TestNotSuffixString_Assert(t *testing.T) {
+	mt := newMockT()
+	NotSuffixString(mt, "hello world", "hello")
+	if mt.failed {
+		t.Error("NotSuffixString failed on incorrect suffix")
+	}
+
+	mt = newMockT()
+	NotSuffixString(mt, "hello world", "world")
+	if !mt.failed {
+		t.Error("NotSuffixString did not fail on correct suffix")
 	}
 }
